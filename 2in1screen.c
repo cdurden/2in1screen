@@ -6,7 +6,7 @@
 #include <string.h>
 
 #define DATA_SIZE 256
-#define N_STATE 2
+#define N_STATE 4
 char basedir[DATA_SIZE];
 char *basedir_end = NULL;
 char content[DATA_SIZE];
@@ -14,6 +14,7 @@ char command[DATA_SIZE*4];
 
 char *ROT[]   = {"normal", 				"inverted", 			"left", 				"right"};
 char *COOR[]  = {"1 0 0 0 1 0 0 0 1",	"-1 0 1 0 -1 1 0 0 1", 	"0 -1 1 1 0 0 0 0 1", 	"0 1 0 -1 0 1 0 0 1"};
+char *LAYO[]  = {"${HOME}/.local/share/onboard/layouts/Split.onboard",	"${HOME}/.local/share/onboard/layouts/Split.onboard", "/usr/share/onboard/layouts/Small.onboard", "/usr/share/onboard/layouts/Small.onboard"};
 // char *TOUCH[] = {"enable", 				"disable", 				"disable", 				"disable"};
 
 double accel_y = 0.0,
@@ -25,7 +26,7 @@ double accel_y = 0.0,
 int current_state = 0;
 
 int rotation_changed(){
-	int state = 0;
+	int state = current_state;
 
 	if(accel_y < -accel_g) state = 0;
 	else if(accel_y > accel_g) state = 1;
@@ -58,8 +59,15 @@ FILE* bdopen(char const *fname, char leave_open){
 void rotate_screen(){
 	sprintf(command, "xrandr -o %s", ROT[current_state]);
 	system(command);
-	sprintf(command, "xinput set-prop \"%s\" \"Coordinate Transformation Matrix\" %s", "Wacom HID 4846 Finger", COOR[current_state]);
+	sprintf(command, "xinput set-prop \"%s\" \"Coordinate Transformation Matrix\" %s", "Wacom HID 482E Finger", COOR[current_state]);
 	system(command);
+	sprintf(command, "xinput set-prop \"%s\" \"Coordinate Transformation Matrix\" %s", "Wacom HID 482E Pen stylus", COOR[current_state]);
+	system(command);
+	sprintf(command, "xinput set-prop \"%s\" \"Coordinate Transformation Matrix\" %s", "Wacom HID 482E Pen eraser", COOR[current_state]);
+	system(command);
+	sprintf(command, "gsettings set org.onboard layout \"%s\"", LAYO[current_state]);
+	system(command);
+	printf("Rotating screen\n");
 }
 
 int main(int argc, char const *argv[]) {

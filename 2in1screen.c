@@ -67,7 +67,6 @@ void rotate_screen(){
 	system(command);
 	sprintf(command, "gsettings set org.onboard layout \"%s\"", LAYO[current_state]);
 	system(command);
-	printf("Rotating screen\n");
 }
 
 int main(int argc, char const *argv[]) {
